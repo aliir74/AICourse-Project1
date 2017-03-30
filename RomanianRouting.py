@@ -5,7 +5,7 @@ class RomanianRouting:
         self.cost = 0
 
 
-    def getInitialState(self):
+    def initialState(self):
         return self.initialState
 
 
