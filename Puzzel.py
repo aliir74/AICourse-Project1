@@ -1,6 +1,7 @@
 class Puzzel:
     def __init__(self, initialState):
         self.initialState = initialState
+        self.cost = 0
 
     def initialState(self):
         return self.initialState
