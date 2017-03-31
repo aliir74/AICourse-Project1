@@ -1,39 +1,46 @@
 import sys
-def BFSTree(initialState, Actions, GoalTest, Result, stepCost, pathCost):
-    f = [initialState()]
+def BFSTree(problem):
+    f = [problem.initialState()]
     while(f != []):
-        stepCost()
+        problem.stepCost()
         currentNode = f[0]
         del f[0]
-        if(GoalTest(currentNode)):
-            return currentNode, pathCost()
-        actions = Actions(currentNode)
+        if(problem.GoalTest(currentNode)):
+            return currentNode, problem.pathCost()
+        actions = problem.Actions(currentNode)
         for a in actions:
-            f += Result(currentNode, a)
+            f += problem.Result(currentNode, a)
     print('F is empty!', sys.stderr)
 
 
-def DLS(initialState, Actions, GoalTest, Result, stepCost, pathCost):
-    return DLSRecursive(initialState(), Actions, GoalTest, Result, stepCost, pathCost)
+def DLS(problem, limit):
+    return DLSRecursive(problem.initialState(), problem, limit)
 
-def DLSRecursive(state, Actions, GoalTest, Result, stepCost, pathCost, limit):
-    if(GoalTest(state)):
-        return state, pathCost()
+def DLSRecursive(state, problem, limit):
+    if(problem.GoalTest(state)):
+        return state, problem.pathCost()
     elif(limit == 0):
-        return 'cutoff', pathCost()
+        return 'cutoff', problem.pathCost()
 
     cutoff = False
-    for a in Actions(state):
-        child = Result(state, a)
-        stepCost()
-        res = DLSRecursive(state, Actions, GoalTest, Result, stepCost, pathCost, limit-1)
+    for a in problem.Actions(state):
+        child = problem.Result(state, a)
+        problem.stepCost()
+        res = DLSRecursive(state, problem, limit-1)
         if(res == 'cutoff'):
             cutoff = True
         elif(res != 'failure'):
-            return res, pathCost()
+            return res, problem.pathCost()
     if(cutoff):
-        return 'cutoff', pathCost()
+        return 'cutoff', problem.pathCost()
     else:
-        return 'failure', pathCost()
+        return 'failure', problem.pathCost()
 
 
+def IDS(problem):
+    for depth in range(1000):
+        res = DLS(problem, depth)
+        if(res != 'cutoff'):
+            return res
+
+    return 'failure'
