@@ -13,6 +13,20 @@ def BFSTree(problem):
     print('F is empty!', sys.stderr)
 
 
+def DFS(problem):
+    return DFSRecursive(state, problem)
+def DFSRecursive(state, problem):
+    if(state == problem.GoalTest()):
+        return state, problem.pathCost()
+
+    for a in problem.Actions(state):
+        child = problem.Result(state, a)
+        problem.stepCost()
+        res = DFSRecursive(child, problem)
+        if(res[0] != 'failure'):
+            return res
+    return 'failure', problem.pathCost()
+
 def DLS(problem, limit):
     return DLSRecursive(problem.initialState(), problem, limit)
 
@@ -26,11 +40,11 @@ def DLSRecursive(state, problem, limit):
     for a in problem.Actions(state):
         child = problem.Result(state, a)
         problem.stepCost()
-        res = DLSRecursive(state, problem, limit-1)
-        if(res == 'cutoff'):
+        res = DLSRecursive(child, problem, limit-1)
+        if(res[0] == 'cutoff'):
             cutoff = True
-        elif(res != 'failure'):
-            return res, problem.pathCost()
+        elif(res[0] != 'failure'):
+            return res
     if(cutoff):
         return 'cutoff', problem.pathCost()
     else:
@@ -40,7 +54,7 @@ def DLSRecursive(state, problem, limit):
 def IDS(problem):
     for depth in range(1000):
         res = DLS(problem, depth)
-        if(res != 'cutoff'):
+        if(res[0] != 'cutoff'):
             return res
 
     return 'failure'
