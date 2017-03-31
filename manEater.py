@@ -1,3 +1,6 @@
+import math
+
+
 class manEater:
     def __init__(self, initialState):
         self.initialState = initialState
@@ -55,3 +58,11 @@ class manEater:
     def pathCost(self):
         return self.cost
 
+    def H(self, state):
+        leftEater = state[1][0][0]
+        leftReligious = state[1][0][1]
+        boatPlace = state[0]
+        if(boatPlace == 'left'):
+            return math.ceil((leftEater+leftReligious)/2)
+        elif(boatPlace == 'right'):
+            return math.ceil((leftEater + leftReligious+1) / 2)

@@ -14,8 +14,11 @@ def BFSTree(problem):
             problem.stepCost(currentNode, a)
     print('F is empty!', sys.stderr)
 
+def bidrectional(problem):
 
-def UCS(problem):
+
+
+def UCSTree(problem):
     f = queue.PriorityQueue(0)
     f.put((0, problem.initialState()))
     while (not f.empty()):

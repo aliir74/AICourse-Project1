@@ -56,3 +56,12 @@ class Puzzel:
     def pathCost(self):
         return self.cost
 
+    def H(self, state):
+        goal = [[1,2,3],[4,5,6],[7,8,0]]
+        ans = 0
+        for i in range(3):
+            for j in range(3):
+                if(goal[i][j] != state[i][j]):
+                    ans += 1
+        return ans
+
