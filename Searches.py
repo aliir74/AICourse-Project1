@@ -1,8 +1,9 @@
+import queue
 import sys
 def BFSTree(problem):
     f = [problem.initialState()]
     while(f != []):
-        problem.stepCost()
+
         currentNode = f[0]
         del f[0]
         if(problem.GoalTest(currentNode)):
@@ -10,8 +11,21 @@ def BFSTree(problem):
         actions = problem.Actions(currentNode)
         for a in actions:
             f += problem.Result(currentNode, a)
+            problem.stepCost(currentNode, a)
     print('F is empty!', sys.stderr)
 
+
+def UCS(problem):
+    f = queue.PriorityQueue(0)
+    f.put((0, problem.initialState()))
+    while (not f.empty()):
+        currentNode = f.get()
+        if (problem.GoalTest(currentNode)):
+            return currentNode, problem.pathCost()
+        actions = problem.Actions(currentNode)
+        for a in actions:
+            f.put(currentNode[0]+problem.stepCost(currentNode, a), problem.Result(currentNode, a))
+    print('F is empty!', sys.stderr)
 
 def DFS(problem):
     return DFSRecursive(state, problem)
@@ -21,7 +35,7 @@ def DFSRecursive(state, problem):
 
     for a in problem.Actions(state):
         child = problem.Result(state, a)
-        problem.stepCost()
+        problem.stepCost(state, a)
         res = DFSRecursive(child, problem)
         if(res[0] != 'failure'):
             return res
@@ -39,7 +53,7 @@ def DLSRecursive(state, problem, limit):
     cutoff = False
     for a in problem.Actions(state):
         child = problem.Result(state, a)
-        problem.stepCost()
+        problem.stepCost(state, a)
         res = DLSRecursive(child, problem, limit-1)
         if(res[0] == 'cutoff'):
             cutoff = True
