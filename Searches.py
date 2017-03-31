@@ -15,6 +15,7 @@ def BFSTree(problem):
     print('F is empty!', sys.stderr)
 
 def bidrectional(problem):
+    pass
 
 
 
@@ -30,8 +31,21 @@ def UCSTree(problem):
             f.put(currentNode[0]+problem.stepCost(currentNode, a), problem.Result(currentNode, a))
     print('F is empty!', sys.stderr)
 
+def Astar(problem):
+    f = queue.PriorityQueue(0)
+    f.put((0+problem.H(problem.initialState()), problem.initialState()))
+    while (not f.empty()):
+        currentNode = f.get()
+        if (problem.GoalTest(currentNode)):
+            return currentNode, problem.pathCost()
+        actions = problem.Actions(currentNode)
+        for a in actions:
+            child = problem.Result(currentNode, a)
+            f.put(problem.H(child) + currentNode[0] + problem.stepCost(currentNode, a), child)
+    print('F is empty!', sys.stderr)
+
 def DFS(problem):
-    return DFSRecursive(state, problem)
+    return DFSRecursive(problem.initialState(), problem)
 def DFSRecursive(state, problem):
     if(state == problem.GoalTest()):
         return state, problem.pathCost()
