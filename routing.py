@@ -1,17 +1,19 @@
+import Searches
+
 class RomanianRouting:
     def __init__(self, source, destination):
-        self.initialState = source
+        self.source = source
         self.destination = destination
         self.cost = 0
 
 
     def initialState(self):
-        return self.initialState
+        return self.source
 
 
     def Actions(self, state):
         ans = []
-        if(state == 'Ordaea'):
+        if(state == 'Oradea'):
             ans = ['Zerind', 'Sibiu']
         elif(state == 'Zerind'):
             ans = ['Oradea', 'Arad']
@@ -67,122 +69,133 @@ class RomanianRouting:
 
     def stepCost(self, state, action):
         nextState = action.split('->')[1]
-
-        if (state == 'Ordaea'):
+        #print(state, nextState)
+        if(state == nextState):
+            return 0
+        if (state == 'Oradea'):
             if(nextState == 'Zerind'):
-                self.cost += 71
+                return 71
             elif(nextState == 'Sibiu'):
-                self.cost += 151
+                return 151
         elif (state == 'Zerind'):
             if(nextState == 'Oradea'):
-                self.cost += 71
+                return 71
             elif(nextState == 'Arad'):
-                self.cost += 75
+                return 75
         elif (state == 'Arad'):
             if(nextState == 'Zerind'):
-                self.cost += 75
+                return 75
             elif(nextState == 'Sibiu'):
-                self.cost += 140
+                return 140
             elif(nextState == 'Timisoara'):
-                self.cost += 118
+                return 118
         elif (state == 'Sibiu'):
             if(nextState == 'Oradea'):
-                self.cost += 151
+                return 151
             elif(nextState == 'Arad'):
-                self.cost += 140
+                return 140
             elif(nextState == 'Rimnicu Vilcea'):
-                self.cost += 80
+                return 80
             elif(nextState == 'Fagaras'):
-                self.cost += 99
+                return 99
         elif (state == 'Fagaras'):
             if(nextState == 'Sibiu'):
-                self.cost += 99
+                return 99
             elif(nextState == 'Bucharest'):
-                self.cost += 211
+                return 211
         elif (state == 'Rimnicu Vilcea'):
             if(nextState == 'Sibiu'):
-                self.cost += 80
+                return 80
             elif(nextState == 'Pitesti'):
-                self.cost += 97
+                return 97
             elif(nextState == 'Craiova'):
-                self.cost += 146
+                return 146
         elif (state == 'Timisoara'):
             if(nextState == 'Arad'):
-                self.cost += 118
+                return 118
             elif(nextState == 'Lugoj'):
-                self.cost += 111
+                return 111
         elif (state == 'Lugoj'):
             if(nextState == 'Timisoara'):
-                self.cost += 111
+                return 111
             elif(nextState == 'Mehadia'):
-                self.cost += 70
+                return 70
         elif (state == 'Pitesti'):
             if(nextState == 'Rimnicu Vilcea'):
-                self.cost += 97
+                return 97
             elif(nextState == 'Craiova'):
-                self.cost += 138
+                return 138
             elif(nextState == 'Bucharest'):
-                self.cost += 101
+                return 101
         elif (state == 'Mehadia'):
             if(nextState == 'Lugoj'):
-                self.cost += 70
+                return 70
             elif(nextState == 'Dobreta'):
-                self.cost += 75
+                return 75
         elif (state == 'Bucharest'):
             if(nextState == 'Pitesti'):
-                self.cost += 101
+                return 101
             elif(nextState == 'Fagaras'):
-                self.cost += 211
+                return 211
             elif(nextState == 'Giurgiu'):
-                self.cost += 90
+                return 90
             elif(nextState == 'Urziceni'):
-                self.cost += 85
+                return 85
         elif (state == 'Dobreta'):
             if(nextState == 'Mehadia'):
-                self.cost += 75
+                return 75
             elif(nextState == 'Craiova'):
-                self.cost += 120
+                return 120
         elif (state == 'Craiova'):
             if(nextState == 'Dobreta'):
-                self.cost += 120
+                return 120
             elif(nextState == 'Rimnicu Vilcea'):
-                self.cost += 146
+                return 146
             elif(nextState == 'Pitesti'):
-                self.cost += 138
+                return 138
         elif (state == 'Giurgiu'):
             if(nextState == 'Bucharest'):
-                self.cost += 90
+                return 90
         elif (state == 'Urziceni'):
             if(nextState == 'Bucharest'):
-                self.cost += 85
+                return 85
             elif(nextState == 'Vaslui'):
-                self.cost += 142
+                return 142
             elif(nextState == 'Hirsova'):
-                self.cost += 98
+                return 98
         elif (state == 'Hirsova'):
             if(nextState == 'Urziceni'):
-                self.cost += 98
+                return 98
             elif(nextState == 'Eforie'):
-                self.cost += 86
+                return 86
         elif (state == 'Eforie'):
             if(nextState == 'Hirsova'):
-                self.cost += 86
+                return 86
         elif (state == 'Vaslui'):
             if(nextState == 'Urziceni'):
-                self.cost += 142
+                return 142
             elif(nextState == 'Iasi'):
-                self.cost += 92
+                return 92
         elif (state == 'Iasi'):
             if(nextState == 'Vaslui'):
-                self.cost += 92
+                return 92
             elif(nextState == 'Neamt'):
-                self.cost += 87
+                return 87
         elif (state == 'Neamt'):
             if(nextState == 'Iasi'):
-                self.cost += 87
+                return 87
 
     def pathCost(self):
         return self.cost
 
 
-
+    def H(self, state):
+        if(state == self.destination):
+            return 0
+        problem = RomanianRouting(state, self.destination)
+        a, b, c, d, e = Searches.UCSGraph(problem)
+        if(b > 211):
+            b -= 211
+        else:
+            b = 0
+        return b

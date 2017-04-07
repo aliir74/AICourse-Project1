@@ -1,29 +1,40 @@
 import copy
 import queue
 import sys
+
+import time
+
+
 def BFSTree(problem):
     f = [[problem.initialState()]]
     seenNode = 1
     expandedNode = 0
     memory = 0
+    counter = 0
     while(f != []):
-
+        counter += 1
+        print(counter)
+        #print(f)
         currentNode = f[0]
+
         del f[0]
         expandedNode += 1
         actions = problem.Actions(currentNode[-1])
+        #time.sleep(1)
         for a in actions:
             child = problem.Result(currentNode[-1], a)
             tmp = copy.deepcopy(currentNode)
+            #tmp = list(currentNode)
             tmp.append(child)
-            f += tmp
+            #print('child' , child, 'tmp', tmp)
+            f.append(tmp)
             seenNode += 1
             memory = sys.getsizeof(f)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 def BFSGraph(problem):
     f = [[problem.initialState()]]
@@ -35,6 +46,7 @@ def BFSGraph(problem):
     while(f != []):
 
         currentNode = f[0]
+
         del f[0]
         e.append(currentNode[-1])
         expandedNode += 1
@@ -46,14 +58,14 @@ def BFSGraph(problem):
             f2.append(child)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
-            f += tmp
+            f.append(tmp)
             seenNode += 1
             memory = sys.getsizeof(f) + sys.getsizeof(e)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 
 
@@ -73,13 +85,13 @@ def UCSTree(problem):
             tmp = copy.deepcopy(currentNode[1])
             tmp.append(child)
             seenNode += 1
-            f.put(currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
+            f.put((currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp))
             memory = sys.getsizeof(f)
             if (problem.GoalTest(child)):
                 return tmp, currentNode[0] + problem.stepCost(currentNode[1][-1], a), expandedNode, seenNode, memory
 
     print('There isnt any solution to destination state ( USC Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 def UCSGraph(problem):
     f = queue.PriorityQueue(0)
@@ -102,13 +114,13 @@ def UCSGraph(problem):
             tmp = copy.deepcopy(currentNode[1])
             tmp.append(child)
             seenNode += 1
-            f.put(currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
+            f.put((currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp))
             memory = sys.getsizeof(f) + sys.getsizeof(f2) + sys.getsizeof(e)
             if (problem.GoalTest(child)):
                 return tmp, currentNode[0] + problem.stepCost(currentNode[1][-1], a), expandedNode, seenNode, memory
 
     print('There isnt any solution to destination state ( USC Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 def Astar(problem):
     f = queue.PriorityQueue(0)
@@ -116,23 +128,32 @@ def Astar(problem):
     seenNode = 1
     expandedNode = 0
     memory = 0
+    counter = 0
     while (not f.empty()):
+        #time.sleep(1)
+        counter +=1
+        print(counter)
         currentNode = f.get()
+        print(currentNode)
         expandedNode += 1
         actions = problem.Actions(currentNode[1][1][-1])
         for a in actions:
             child = problem.Result(currentNode[1][1][-1], a)
+
             tmp = copy.deepcopy(currentNode[1])
+            #print(tmp)
+            #print(currentNode[1][1][-1])
             tmp[1].append(child)
             tmp[0] += problem.stepCost(currentNode[1][1][-1], a)
+
             seenNode += 1
-            f.put(problem.H(child) + currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
+            f.put((problem.H(child) + currentNode[0] + problem.stepCost(currentNode[1][-1][-1], a), tmp))
             memory = sys.getsizeof(f)
             if (problem.GoalTest(child)):
                 return tmp[1], tmp[0], expandedNode, seenNode, memory
 
     print('There isnt any solution to destination state ( Astar Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 def AstarGraph(problem):
     f = queue.PriorityQueue(0)
@@ -156,13 +177,13 @@ def AstarGraph(problem):
             tmp[1].append(child)
             tmp[0] += problem.stepCost(currentNode[1][1][-1], a)
             seenNode += 1
-            f.put(problem.H(child) + currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
+            f.put((problem.H(child) + currentNode[0] + problem.stepCost(currentNode[1][-1][-1], a), tmp))
             memory = sys.getsizeof(f) + sys.getsizeof(f2) + sys.getsizeof(e)
             if (problem.GoalTest(child)):
                 return tmp[1], tmp[0], expandedNode, seenNode, memory
 
     print('There isnt any solution to destination state ( Astar Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 
 def DFSTree(problem):
@@ -180,14 +201,14 @@ def DFSTree(problem):
             child = problem.Result(currentNode[-1], a)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
-            f += tmp
+            f.append(tmp)
             seenNode += 1
             memory = sys.getsizeof(f)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 def DFSGraph(problem):
     f = [[problem.initialState()]]
@@ -196,28 +217,32 @@ def DFSGraph(problem):
     seenNode = 1
     expandedNode = 0
     memory = 0
+    counter = 0
     while(f != []):
-
+        counter += 1
+        #print(counter)
         currentNode = f[-1]
         del f[-1]
         e.append(currentNode[-1])
         expandedNode += 1
         actions = problem.Actions(currentNode[-1])
+        #print(actions)
         for a in actions:
             child = problem.Result(currentNode[-1], a)
             if (not ((child not in e) and (child not in f2))):
                 continue
             f2.append(child)
+
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
-            f += tmp
+            f.append(tmp)
             seenNode += 1
             memory = sys.getsizeof(f) + sys.getsizeof(e)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 '''
 
@@ -252,14 +277,14 @@ def DLSTree(problem, limit):
             child = problem.Result(currentNode[-1], a)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
-            f += tmp
+            f.append(tmp)
             seenNode += 1
             memory = sys.getsizeof(f)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( DLS Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 def DLSGraph(problem, limit):
     f = [[problem.initialState()]]
@@ -284,14 +309,14 @@ def DLSGraph(problem, limit):
             f2.append(child)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
-            f += tmp
+            f.append(tmp)
             seenNode += 1
             memory = sys.getsizeof(f) + sys.getsizeof(e)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( DLS Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 
 '''
@@ -355,7 +380,7 @@ def BidrectionalTree(problem):
                 child = problem.Result(currentNode[-1], a)
                 tmp = copy.deepcopy(currentNode)
                 tmp.append(child)
-                f += tmp
+                f.append(tmp)
                 seenNode += 1
                 memory = sys.getsizeof(f)
 
@@ -370,15 +395,18 @@ def BidrectionalTree(problem):
                 child = problem.Result(currentNode2[-1], a)
                 tmp = copy.deepcopy(currentNode2)
                 tmp.append(child)
-                f2 += tmp
+                f2.append(tmp)
                 seenNode += 1
         memory = sys.getsizeof(f) + sys.getsizeof(f2)
+        #print(f)
+        #print(f2)
         for i in f:
             for j in f2:
                 if(i[-1] == j[-1]):
-                    return i[0:-1]+j.reverse(), len(i[0:-1]+j.reverse())-1, expandedNode, seenNode, memory
+                    j.reverse()
+                    return i[0:len(i)-1]+j, len(i[0:-1]+j)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( Bidrectional Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory
 
 
 def BidrectionalGraph(problem):
@@ -408,7 +436,7 @@ def BidrectionalGraph(problem):
                 ftmp.append(child)
                 tmp = copy.deepcopy(currentNode)
                 tmp.append(child)
-                f += tmp
+                f.append(tmp)
                 seenNode += 1
                 memory = sys.getsizeof(f)
 
@@ -427,7 +455,7 @@ def BidrectionalGraph(problem):
                 f2tmp.append(child)
                 tmp = copy.deepcopy(currentNode2)
                 tmp.append(child)
-                f2 += tmp
+                f2.append(tmp)
                 seenNode += 1
         memory = sys.getsizeof(f) + sys.getsizeof(f2) + sys.getsizeof(e) + sys.getsizeof(e2) + sys.getsizeof(ftmp) + sys.getsizeof(f2tmp)
         for i in f:
@@ -435,4 +463,4 @@ def BidrectionalGraph(problem):
                 if(i[-1] == j[-1]):
                     return i[0:-1]+j.reverse(), len(i[0:-1]+j.reverse())-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( Bidrectional Tree )!', sys.stderr)
-    return [], 0, expandedNode, seenNode, memory
+    return [], 1000000, expandedNode, seenNode, memory

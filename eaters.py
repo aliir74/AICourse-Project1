@@ -1,13 +1,14 @@
+import copy
 import math
 
 
 class manEater:
-    def __init__(self, initialState):
-        self.initialState = initialState
+    def __init__(self, firstState):
+        self.initialSt = firstState
         self.cost = 0
 
     def initialState(self):
-        return self.initialState
+        return self.initialSt
 
     def Actions(self, state):
         list = []
@@ -32,20 +33,25 @@ class manEater:
         return list
 
     def Result(self, state, action):
+        ansstate = copy.deepcopy(state)
         direction, eaterCount, religiousCount = action.split('-')
         if(direction == 'right'):
-            state[1][1][0] += int(eaterCount)
-            state[1][1][1] += int(religiousCount)
+            ansstate[1][1][0] += int(eaterCount)
+            ansstate[1][1][1] += int(religiousCount)
+            ansstate[1][0][0] -= int(eaterCount)
+            ansstate[1][0][1] -= int(religiousCount)
         else:
-            state[1][0][0] += int(eaterCount)
-            state[1][0][1] += int(religiousCount)
+            ansstate[1][0][0] += int(eaterCount)
+            ansstate[1][0][1] += int(religiousCount)
+            ansstate[1][1][0] -= int(eaterCount)
+            ansstate[1][1][1] -= int(religiousCount)
 
         if(state[0] == 'right'):
-            state[0] = 'left'
+            ansstate[0] = 'left'
         else:
-            state[1] = 'right'
+            ansstate[0] = 'right'
 
-        return state
+        return ansstate
 
     def GoalTest(self, state):
         if(state == ['right', [ [0,0], [3,3] ] ]):
@@ -56,7 +62,8 @@ class manEater:
         return ['right', [ [0,0], [3,3] ] ]
 
     def stepCost(self, state, action):
-        self.cost += 1
+        return 1
+        #self.cost += 1
 
     def pathCost(self):
         return self.cost
