@@ -1,18 +1,53 @@
+import copy
 import queue
 import sys
 def BFSTree(problem):
-    f = [problem.initialState()]
+    f = [[problem.initialState()]]
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
     while(f != []):
 
         currentNode = f[0]
         del f[0]
-        if(problem.GoalTest(currentNode)):
-            return currentNode, problem.pathCost()
-        actions = problem.Actions(currentNode)
+        expandedNode += 1
+        actions = problem.Actions(currentNode[-1])
         for a in actions:
-            f += problem.Result(currentNode, a)
-            problem.stepCost(currentNode, a)
-    print('F is empty!', sys.stderr)
+            child = problem.Result(currentNode[-1], a)
+            tmp = copy.deepcopy(currentNode)
+            tmp.append(child)
+            f += tmp
+            seenNode += 1
+            memory = sys.getsizeof(f)
+            problem.stepCost(currentNode[-1], a)
+            if(problem.GoalTest(child)):
+                return tmp, len(tmp)-1, expandedNode, seenNode, memory
+    print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
+
+def BFSGraph(problem):
+    f = [[problem.initialState()]]
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
+    while(f != []):
+
+        currentNode = f[0]
+        del f[0]
+        expandedNode += 1
+        actions = problem.Actions(currentNode[-1])
+        for a in actions:
+            child = problem.Result(currentNode[-1], a)
+            tmp = copy.deepcopy(currentNode)
+            tmp.append(child)
+            f += tmp
+            seenNode += 1
+            memory = sys.getsizeof(f)
+            problem.stepCost(currentNode[-1], a)
+            if(problem.GoalTest(child)):
+                return tmp, len(tmp)-1, expandedNode, seenNode, memory
+    print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
 
 def bidrectional(problem):
     pass
@@ -21,28 +56,76 @@ def bidrectional(problem):
 
 def UCSTree(problem):
     f = queue.PriorityQueue(0)
-    f.put((0, problem.initialState()))
+    f.put((0, [problem.initialState()]))
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
     while (not f.empty()):
         currentNode = f.get()
-        if (problem.GoalTest(currentNode)):
-            return currentNode, problem.pathCost()
-        actions = problem.Actions(currentNode)
+        expandedNode += 1
+        actions = problem.Actions(currentNode[1][-1])
         for a in actions:
-            f.put(currentNode[0]+problem.stepCost(currentNode, a), problem.Result(currentNode, a))
-    print('F is empty!', sys.stderr)
+            child = problem.Result(currentNode[1][-1], a)
+            tmp = copy.deepcopy(currentNode[1])
+            tmp.append(child)
+            seenNode += 1
+            f.put(currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
+            memory = sys.getsizeof(f)
+            if (problem.GoalTest(child)):
+                return tmp, currentNode[0] + problem.stepCost(currentNode[1][-1], a), expandedNode, seenNode, memory
+
+    print('There isnt any solution to destination state ( USC Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
 
 def Astar(problem):
     f = queue.PriorityQueue(0)
-    f.put((0+problem.H(problem.initialState()), problem.initialState()))
+    f.put((0+problem.H(problem.initialState()), [0, [problem.initialState()]]))
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
     while (not f.empty()):
         currentNode = f.get()
-        if (problem.GoalTest(currentNode)):
-            return currentNode, problem.pathCost()
-        actions = problem.Actions(currentNode)
+        expandedNode += 1
+        actions = problem.Actions(currentNode[1][1][-1])
         for a in actions:
-            child = problem.Result(currentNode, a)
-            f.put(problem.H(child) + currentNode[0] + problem.stepCost(currentNode, a), child)
-    print('F is empty!', sys.stderr)
+            child = problem.Result(currentNode[1][1][-1], a)
+            tmp = copy.deepcopy(currentNode[1])
+            tmp[1].append(child)
+            tmp[0] += problem.stepCost(currentNode[1][1][-1], a)
+            seenNode += 1
+            f.put(problem.H(child) + currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
+            memory = sys.getsizeof(f)
+            if (problem.GoalTest(child)):
+                return tmp[1], tmp[0], expandedNode, seenNode, memory
+
+    print('There isnt any solution to destination state ( Astar Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
+
+def DFSTree(problem):
+    f = [[problem.initialState()]]
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
+    while(f != []):
+
+        currentNode = f[-1]
+        del f[-1]
+        expandedNode += 1
+        actions = problem.Actions(currentNode[-1])
+        for a in actions:
+            child = problem.Result(currentNode[-1], a)
+            tmp = copy.deepcopy(currentNode)
+            tmp.append(child)
+            f += tmp
+            seenNode += 1
+            memory = sys.getsizeof(f)
+            problem.stepCost(currentNode[-1], a)
+            if(problem.GoalTest(child)):
+                return tmp, len(tmp)-1, expandedNode, seenNode, memory
+    print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
+
+'''
 
 def DFS(problem):
     return DFSRecursive(problem.initialState(), problem)
@@ -57,7 +140,34 @@ def DFSRecursive(state, problem):
         if(res[0] != 'failure'):
             return res
     return 'failure', problem.pathCost()
+'''
 
+def DLSTree(problem, limit):
+    f = [[problem.initialState()]]
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
+    while(f != []):
+        currentNode = f[-1]
+        del f[-1]
+        if(len(currentNode) > limit):
+            continue
+        expandedNode += 1
+        actions = problem.Actions(currentNode[-1])
+        for a in actions:
+            child = problem.Result(currentNode[-1], a)
+            tmp = copy.deepcopy(currentNode)
+            tmp.append(child)
+            f += tmp
+            seenNode += 1
+            memory = sys.getsizeof(f)
+            problem.stepCost(currentNode[-1], a)
+            if(problem.GoalTest(child)):
+                return tmp, len(tmp)-1, expandedNode, seenNode, memory
+    print('There isnt any solution to destination state ( DLS Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
+
+'''
 def DLS(problem, limit):
     return DLSRecursive(problem.initialState(), problem, limit)
 
@@ -81,11 +191,12 @@ def DLSRecursive(state, problem, limit):
     else:
         return 'failure', problem.pathCost()
 
+'''
 
 def IDS(problem):
-    for depth in range(1000):
-        res = DLS(problem, depth)
-        if(res[0] != 'cutoff'):
-            return res
+    for depth in range(1, 1000):
+        path, cost, exapndNode, seenNode, memory = DLSTree(problem, depth)
+        if(path != []):
+            return path, cost, exapndNode, seenNode, memory
 
-    return 'failure'
+    return path, cost, exapndNode, seenNode, memory
