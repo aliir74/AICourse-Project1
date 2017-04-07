@@ -52,6 +52,9 @@ class manEater:
             return True
         return False
 
+    def GoalState(self):
+        return ['right', [ [0,0], [3,3] ] ]
+
     def stepCost(self, state, action):
         self.cost += 1
 

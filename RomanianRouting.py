@@ -62,6 +62,9 @@ class RomanianRouting:
             return True
         return False
 
+    def GoalState(self):
+        return self.destination
+
     def stepCost(self, state, action):
         nextState = action.split('->')[1]
 

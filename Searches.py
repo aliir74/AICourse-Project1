@@ -28,6 +28,7 @@ def BFSTree(problem):
 def BFSGraph(problem):
     f = [[problem.initialState()]]
     e = []
+    f2 = [problem.initialState()]
     seenNode = 1
     expandedNode = 0
     memory = 0
@@ -40,21 +41,20 @@ def BFSGraph(problem):
         actions = problem.Actions(currentNode[-1])
         for a in actions:
             child = problem.Result(currentNode[-1], a)
-            if(not((child not in e)and(child not in f))):
+            if(not((child not in e)and(child not in f2))):
                 continue
+            f2.append(child)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
             f += tmp
             seenNode += 1
-            memory = sys.getsizeof(f)
+            memory = sys.getsizeof(f) + sys.getsizeof(e)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
     print('There isnt any solution to destination state ( BFS Tree )!', sys.stderr)
     return [], 0, expandedNode, seenNode, memory
 
-def bidrectional(problem):
-    pass
 
 
 
@@ -103,7 +103,7 @@ def UCSGraph(problem):
             tmp.append(child)
             seenNode += 1
             f.put(currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
-            memory = sys.getsizeof(f)
+            memory = sys.getsizeof(f) + sys.getsizeof(f2) + sys.getsizeof(e)
             if (problem.GoalTest(child)):
                 return tmp, currentNode[0] + problem.stepCost(currentNode[1][-1], a), expandedNode, seenNode, memory
 
@@ -157,7 +157,7 @@ def AstarGraph(problem):
             tmp[0] += problem.stepCost(currentNode[1][1][-1], a)
             seenNode += 1
             f.put(problem.H(child) + currentNode[0] + problem.stepCost(currentNode[1][-1], a), tmp)
-            memory = sys.getsizeof(f)
+            memory = sys.getsizeof(f) + sys.getsizeof(f2) + sys.getsizeof(e)
             if (problem.GoalTest(child)):
                 return tmp[1], tmp[0], expandedNode, seenNode, memory
 
@@ -192,6 +192,7 @@ def DFSTree(problem):
 def DFSGraph(problem):
     f = [[problem.initialState()]]
     e = []
+    f2 = [problem.initialState()]
     seenNode = 1
     expandedNode = 0
     memory = 0
@@ -204,13 +205,14 @@ def DFSGraph(problem):
         actions = problem.Actions(currentNode[-1])
         for a in actions:
             child = problem.Result(currentNode[-1], a)
-            if (not ((child not in e) and (child not in f))):
+            if (not ((child not in e) and (child not in f2))):
                 continue
+            f2.append(child)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
             f += tmp
             seenNode += 1
-            memory = sys.getsizeof(f)
+            memory = sys.getsizeof(f) + sys.getsizeof(e)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
@@ -262,6 +264,8 @@ def DLSTree(problem, limit):
 def DLSGraph(problem, limit):
     f = [[problem.initialState()]]
     e = []
+    f2 = [problem.initialState()]
+
     seenNode = 1
     expandedNode = 0
     memory = 0
@@ -275,13 +279,14 @@ def DLSGraph(problem, limit):
         actions = problem.Actions(currentNode[-1])
         for a in actions:
             child = problem.Result(currentNode[-1], a)
-            if (not ((child not in e) and (child not in f))):
+            if (not ((child not in e) and (child not in f2))):
                 continue
+            f2.append(child)
             tmp = copy.deepcopy(currentNode)
             tmp.append(child)
             f += tmp
             seenNode += 1
-            memory = sys.getsizeof(f)
+            memory = sys.getsizeof(f) + sys.getsizeof(e)
             problem.stepCost(currentNode[-1], a)
             if(problem.GoalTest(child)):
                 return tmp, len(tmp)-1, expandedNode, seenNode, memory
@@ -330,3 +335,104 @@ def IDSGraph(problem):
             return path, cost, exapndNode, seenNode, memory
 
     return path, cost, exapndNode, seenNode, memory
+
+def BidrectionalTree(problem):
+    f = [[problem.initialState()]]
+    f2 = [[problem.GoalState()]]
+    index1 = 0
+    index2 = 0
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
+    while (f != [] or f2 != []):
+        if(f != []):
+            currentNode = f[index1]
+            #del f[0]
+            index1 += 1
+            expandedNode += 1
+            actions = problem.Actions(currentNode[-1])
+            for a in actions:
+                child = problem.Result(currentNode[-1], a)
+                tmp = copy.deepcopy(currentNode)
+                tmp.append(child)
+                f += tmp
+                seenNode += 1
+                memory = sys.getsizeof(f)
+
+        if(f2 != []):
+            currentNode2 = f2[index2]
+            #del f2[0]
+            index2 += 1
+            expandedNode += 1
+            actions2 = problem.Actions(currentNode2[-1])
+
+            for a in actions2:
+                child = problem.Result(currentNode2[-1], a)
+                tmp = copy.deepcopy(currentNode2)
+                tmp.append(child)
+                f2 += tmp
+                seenNode += 1
+        memory = sys.getsizeof(f) + sys.getsizeof(f2)
+        for i in f:
+            for j in f2:
+                if(i[-1] == j[-1]):
+                    return i[0:-1]+j.reverse(), len(i[0:-1]+j.reverse())-1, expandedNode, seenNode, memory
+    print('There isnt any solution to destination state ( Bidrectional Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
+
+
+def BidrectionalGraph(problem):
+    f = [[problem.initialState()]]
+    ftmp = [problem.initialState()]
+    e = []
+    f2 = [[problem.GoalState()]]
+    f2tmp = [problem.initialState()]
+    e2 = []
+    index1 = 0
+    index2 = 0
+    seenNode = 1
+    expandedNode = 0
+    memory = 0
+    while (f != [] or f2 != []):
+        if(f != []):
+            currentNode = f[index1]
+            #del f[0]
+            e.append(currentNode[-1])
+            index1 += 1
+            expandedNode += 1
+            actions = problem.Actions(currentNode[-1])
+            for a in actions:
+                child = problem.Result(currentNode[-1], a)
+                if (not ((child not in e) and (child not in ftmp))):
+                    continue
+                ftmp.append(child)
+                tmp = copy.deepcopy(currentNode)
+                tmp.append(child)
+                f += tmp
+                seenNode += 1
+                memory = sys.getsizeof(f)
+
+        if(f2 != []):
+            currentNode2 = f2[index2]
+            #del f2[0]
+            index2 += 1
+            e2.append(currentNode[-1])
+            expandedNode += 1
+            actions2 = problem.Actions(currentNode2[-1])
+
+            for a in actions2:
+                child = problem.Result(currentNode2[-1], a)
+                if (not ((child not in e) and (child not in f2tmp))):
+                    continue
+                f2tmp.append(child)
+                tmp = copy.deepcopy(currentNode2)
+                tmp.append(child)
+                f2 += tmp
+                seenNode += 1
+        memory = sys.getsizeof(f) + sys.getsizeof(f2) + sys.getsizeof(e) + sys.getsizeof(e2) + sys.getsizeof(ftmp) + sys.getsizeof(f2tmp)
+        for i in f:
+            for j in f2:
+                if(i[-1] == j[-1]):
+                    return i[0:-1]+j.reverse(), len(i[0:-1]+j.reverse())-1, expandedNode, seenNode, memory
+    print('There isnt any solution to destination state ( Bidrectional Tree )!', sys.stderr)
+    return [], 0, expandedNode, seenNode, memory
